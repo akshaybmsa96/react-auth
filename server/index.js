@@ -12,7 +12,6 @@ const corsOptions = {
 };
 
 function validate(username, password) {
-  console.log(db);
   if (
     db.find(function (val) {
       return val.username === username && val.password === password;
@@ -40,10 +39,8 @@ app.get("/", function (req, res) {
 app.post("/login", function (req, res) {
   var userData = req.body;
   let isUSer = validate(userData.userName, userData.password);
-  console.log(userData, isUSer);
   if (isUSer) {
     setTimeout(() => {
-      session.email = "Yo";
       return res.json({ userData, validated: isUSer });
     }, 1000);
   } else {

@@ -1,0 +1,33 @@
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+}
+
+.heading {
+  color: black;
+  font-weight: 800;
+}
+
+.input {
+  margin: 10px;
+  outline: none;
+  height: 30px;
+  font-size: 16px;
+  padding: 5px;
+}
+
+.input:hover {
+  outline: none;
+}
+
+.loginButton {
+  margin: 30px 10px;
+  background: rgb(17, 17, 179);
+  color: white;
+  font-size: 18px;
+  padding: 10px;
+  font-weight: 800;
+  outline: rgb(17, 17, 179);
+  border: rgb(17, 17, 179);
+}
