@@ -1,8 +1,7 @@
 const BASE_URL = "http://localhost:3001";
+const controller = new AbortController();
+const signal = controller.signal;
 export const loginAction = ({ userName, password }) => {
-  const controller = new AbortController();
-  const signal = controller.signal;
-
   return new Promise((resolve, rej) => {
     fetch(BASE_URL + "/login", {
       method: "POST",
@@ -15,10 +14,14 @@ export const loginAction = ({ userName, password }) => {
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        // sessionStorage.setItem(
-        //   "loggedInStatue",
-        //   JSON.stringify({ userName, loggedIn: true })
-        // );
+        sessionStorage.setItem(
+          "loggedInStatue",
+          JSON.stringify({ userName, loggedIn: true })
+        );
+        localStorage.setItem(
+          "loggedInStatue",
+          JSON.stringify({ userName, loggedIn: true })
+        );
         createCookie("loggedInStatus", true, 1);
         resolve(true);
       })
@@ -31,13 +34,43 @@ export const loginAction = ({ userName, password }) => {
   //controller.abort();
 };
 
+export const registerAction = ({ userName, password }) => {
+  return new Promise((resolve, rej) => {
+    fetch(BASE_URL + "/register", {
+      method: "POST",
+      signal,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userName, password }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        sessionStorage.setItem(
+          "loggedInStatus",
+          JSON.stringify({ userName, loggedIn: true })
+        );
+        localStorage.setItem(
+          "loggedInStatus",
+          JSON.stringify({ userName, loggedIn: true })
+        );
+        createCookie("loggedInStatus", true, 1);
+        resolve(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        rej("Error");
+      });
+  });
+};
+
 function createCookie(name, value, minutes) {
+  let expires = "";
   if (minutes) {
-    var date = new Date();
+    let date = new Date();
     date.setTime(date.getTime() + minutes * 60 * 1000);
-    var expires = "; expires=" + date.toGMTString();
-  } else {
-    var expires = "";
+    expires = "; expires=" + date.toGMTString();
   }
   document.cookie = name + "=" + value + expires + "; path=/";
 }

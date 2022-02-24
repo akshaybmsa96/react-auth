@@ -1,9 +1,8 @@
 var express = require("express");
 var app = express();
 var cors = require("cors");
-const db = require("./db.json");
-
-let session = "";
+const db = require("./db");
+const encyption = require("bcrypt");
 
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -11,16 +10,36 @@ const corsOptions = {
   allowedHeaders: ["Content-Type"],
 };
 
-function validate(username, password) {
+async function validate(username, password) {
+  let userExists = db.find(function (val) {
+    return val.username === username;
+  });
+  if (userExists) {
+    const match = await encyption.compare(password, userExists.password);
+    if (match) return true;
+
+    return false;
+  }
+
+  return false;
+}
+
+function checkUserExistance(username) {
   if (
     db.find(function (val) {
-      return val.username === username && val.password === password;
+      return val.username === username;
     })
   ) {
     return true;
   }
 
   return false;
+}
+
+async function storeUSer(username, password) {
+  const pass = await encyption.hash(password, 10);
+  console.log(pass);
+  db.push({ username: username, password: pass });
 }
 
 app.use(cors(corsOptions));
@@ -36,18 +55,34 @@ app.get("/", function (req, res) {
   return res.send("Working fine");
 });
 
-app.post("/login", function (req, res) {
+app.post("/login", async function (req, res) {
   var userData = req.body;
-  let isUSer = validate(userData.userName, userData.password);
+  let isUSer = await validate(userData.userName, userData.password);
   if (isUSer) {
     setTimeout(() => {
       return res.json({ userData, validated: isUSer });
-    }, 1000);
+    }, 5000);
   } else {
     setTimeout(() => {
       res.statusCode = 401;
-      return res.send("None shall pass");
-    }, 1000);
+      return res.send("User doesn't exists");
+    }, 5000);
+  }
+});
+
+app.post("/register", function (req, res) {
+  var userData = req.body;
+  if (checkUserExistance(userData.userName)) {
+    setTimeout(() => {
+      res.statusCode = 401;
+      return res.send("User Already exists");
+    }, 5000);
+  } else {
+    storeUSer(userData.userName, userData.password).then(() => {
+      setTimeout(() => {
+        return res.json({ userData, created: true });
+      }, 5000);
+    });
   }
 });
 

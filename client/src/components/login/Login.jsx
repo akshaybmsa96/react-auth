@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkLoggedInStatus } from "../../action/checkAndChangeRoute";
 import { loginAction } from "../../action/loginAction";
+import Loader from "../loader/Loader";
 import "./style.css";
 
 export const Login = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const userNameRef = useRef();
   const userPassword = useRef();
@@ -21,12 +24,17 @@ export const Login = () => {
 
   const onLoginClick = (e) => {
     e.stopPropagation();
+    setLoading(true);
+    setError(false);
     loginAction({ userName, password })
       .then((res) => {
+        setLoading(false);
         res && navigate("/home");
       })
       .catch((err) => {
         console.log(err);
+        setLoading(false);
+        setError(true);
       });
   };
 
@@ -60,9 +68,12 @@ export const Login = () => {
           placeholder={"Password"}
         ></input>
         <button className="loginButton" onClick={onLoginClick}>
-          Login
+          LOGIN
         </button>
+        <a href="/register">Register</a>
+        {error && <div style={{ color: "red" }}>Wrong credentials</div>}
       </section>
+      {loading && <Loader />}
     </div>
   );
 };
