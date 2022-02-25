@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { checkLoggedInStatus } from "../../action/checkAndChangeRoute";
+import {
+  checkLoggedInStatus,
+  logoutAction,
+} from "../../action/checkAndChangeRoute";
 import "./style.css";
 
 export const Home = () => {
@@ -13,9 +16,11 @@ export const Home = () => {
   }, [navigate]);
 
   return (
-    <div>
-      <h1>Hello this is a home component</h1>
-      <h2>Welcome to the Photo Gallary</h2>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <a className="logout" href="/login" onClick={logoutAction}>
+        logout
+      </a>
+      <h1>Welcome to the Photo Gallary</h1>
 
       <div>
         <img

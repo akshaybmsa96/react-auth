@@ -22,7 +22,7 @@ export const loginAction = ({ userName, password }) => {
           "loggedInStatue",
           JSON.stringify({ userName, loggedIn: true })
         );
-        createCookie("loggedInStatus", true, 1);
+        createCookie("loggedInStatus", true, 5);
         resolve(true);
       })
       .catch((err) => {
@@ -55,7 +55,7 @@ export const registerAction = ({ userName, password }) => {
           "loggedInStatus",
           JSON.stringify({ userName, loggedIn: true })
         );
-        createCookie("loggedInStatus", true, 1);
+        createCookie("loggedInStatus", true, 5);
         resolve(true);
       })
       .catch((err) => {

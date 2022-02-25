@@ -2,3 +2,10 @@
   width: 50%;
   height: 50%;
 }
+
+.logout {
+  align-self: end;
+  position: relative;
+  justify-self: end;
+  margin: 10px;
+}
