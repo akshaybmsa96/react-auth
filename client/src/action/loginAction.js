@@ -15,14 +15,14 @@ export const loginAction = ({ userName, password }) => {
       .then((res) => {
         console.log(res);
         sessionStorage.setItem(
-          "loggedInStatue",
-          JSON.stringify({ userName, loggedIn: true })
+          "loggedInStatus",
+          JSON.stringify({ userName, loggedIn: true, jwt: res.token })
         );
-        localStorage.setItem(
-          "loggedInStatue",
-          JSON.stringify({ userName, loggedIn: true })
-        );
-        createCookie("loggedInStatus", true, 5);
+        // localStorage.setItem(
+        //   "loggedInStatue",
+        //   JSON.stringify({ userName, loggedIn: true })
+        // );
+        createCookie("loggedInStatus", JSON.stringify(res), 5);
         resolve(true);
       })
       .catch((err) => {
@@ -49,18 +49,40 @@ export const registerAction = ({ userName, password }) => {
         console.log(res);
         sessionStorage.setItem(
           "loggedInStatus",
-          JSON.stringify({ userName, loggedIn: true })
+          JSON.stringify({ userName, loggedIn: true, jwt: res.token })
         );
-        localStorage.setItem(
-          "loggedInStatus",
-          JSON.stringify({ userName, loggedIn: true })
-        );
+        // localStorage.setItem(
+        //   "loggedInStatus",
+        //   JSON.stringify({ userName, loggedIn: true })
+        // );
         createCookie("loggedInStatus", true, 5);
         resolve(true);
       })
       .catch((err) => {
         console.log(err);
         rej("Error");
+      });
+  });
+};
+
+export const validateToken = (token) => {
+  token = JSON.parse(sessionStorage.getItem("loggedInStatus")).jwt;
+  return new Promise((resolve, rej) => {
+    fetch(BASE_URL + "/validate", {
+      method: "GET",
+      signal,
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((err) => {
+        console.log(err);
+        rej(err);
       });
   });
 };

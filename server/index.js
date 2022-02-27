@@ -1,14 +1,23 @@
+require("dotenv").config();
 var express = require("express");
 var app = express();
 var cors = require("cors");
 const db = require("./db");
 const encyption = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const corsOptions = {
   origin: "http://localhost:3000",
   methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "token"],
 };
+
+app.use(cors(corsOptions));
+
+var bodyParser = require("body-parser");
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 async function validate(username, password) {
   let userExists = db.find(function (val) {
@@ -42,13 +51,6 @@ async function storeUSer(username, password) {
   db.push({ username: username, password: pass });
 }
 
-app.use(cors(corsOptions));
-
-var bodyParser = require("body-parser");
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
 // GET /api/users
 app.get("/", function (req, res) {
   session = req.session;
@@ -59,8 +61,14 @@ app.post("/login", async function (req, res) {
   var userData = req.body;
   let isUSer = await validate(userData.userName, userData.password);
   if (isUSer) {
+    const userToken = jwt.sign(
+      { user: userData.userName },
+      process.env.ACCESS_TOKEN_SECRET_KEY,
+      { expiresIn: 60 }
+    );
+    console.log(userToken);
     setTimeout(() => {
-      return res.json({ userData, validated: isUSer });
+      return res.json({ token: userToken, validated: isUSer });
     }, 5000);
   } else {
     setTimeout(() => {
@@ -70,7 +78,7 @@ app.post("/login", async function (req, res) {
   }
 });
 
-app.post("/register", function (req, res) {
+app.get("/register", function (req, res) {
   var userData = req.body;
   if (checkUserExistance(userData.userName)) {
     setTimeout(() => {
@@ -84,6 +92,20 @@ app.post("/register", function (req, res) {
       }, 5000);
     });
   }
+});
+
+app.get("/validate", function (req, res) {
+  const token = req.headers["token"];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, function (err, user) {
+    if (err) {
+      res.statusCode = 401;
+      res.send(err);
+    } else {
+      console.log(user);
+      res.json({ validate: true });
+    }
+  });
 });
 
 app.listen("3001", function () {
