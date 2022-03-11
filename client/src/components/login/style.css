@@ -31,3 +31,8 @@
   outline: rgb(17, 17, 179);
   border: rgb(17, 17, 179);
 }
+
+form {
+  display: flex;
+  flex-direction: inherit;
+}

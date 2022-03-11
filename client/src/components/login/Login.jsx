@@ -24,6 +24,7 @@ export const Login = () => {
 
   const onLoginClick = (e) => {
     e.stopPropagation();
+    e.preventDefault();
     setLoading(true);
     setError(false);
     loginAction({ userName, password })
@@ -51,25 +52,27 @@ export const Login = () => {
     <div>
       <h1 className="heading">Login</h1>
       <section className="loginForm">
-        <input
-          className="input"
-          onChange={onKeyChange}
-          type={"text"}
-          ref={userNameRef}
-          value={userName}
-          placeholder={"Username"}
-        ></input>
-        <input
-          className="input"
-          onChange={onKeyChange}
-          type={"password"}
-          ref={userPassword}
-          value={password}
-          placeholder={"Password"}
-        ></input>
-        <button className="loginButton" onClick={onLoginClick}>
-          LOGIN
-        </button>
+        <form onSubmit={onLoginClick}>
+          <input
+            className="input"
+            onChange={onKeyChange}
+            type={"text"}
+            ref={userNameRef}
+            value={userName}
+            placeholder={"Username"}
+          ></input>
+          <input
+            className="input"
+            onChange={onKeyChange}
+            type={"password"}
+            ref={userPassword}
+            value={password}
+            placeholder={"Password"}
+          ></input>
+          <button className="loginButton" type="submit">
+            LOGIN
+          </button>
+        </form>
         <a href="/register">Register</a>
         {error && <div style={{ color: "red" }}>Wrong credentials</div>}
       </section>

@@ -6,6 +6,7 @@ export const loginAction = ({ userName, password }) => {
     fetch(BASE_URL + "/login", {
       method: "POST",
       signal,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -22,7 +23,6 @@ export const loginAction = ({ userName, password }) => {
         //   "loggedInStatue",
         //   JSON.stringify({ userName, loggedIn: true })
         // );
-        createCookie("loggedInStatus", JSON.stringify(res), 5);
         resolve(true);
       })
       .catch((err) => {
@@ -39,6 +39,7 @@ export const registerAction = ({ userName, password }) => {
     fetch(BASE_URL + "/register", {
       method: "POST",
       signal,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -55,7 +56,7 @@ export const registerAction = ({ userName, password }) => {
         //   "loggedInStatus",
         //   JSON.stringify({ userName, loggedIn: true })
         // );
-        createCookie("loggedInStatus", true, 5);
+        //createCookie("loggedInStatus", true, 5);
         resolve(true);
       })
       .catch((err) => {
@@ -71,6 +72,7 @@ export const validateToken = (token) => {
     fetch(BASE_URL + "/validate", {
       method: "GET",
       signal,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         token: token,
@@ -78,6 +80,9 @@ export const validateToken = (token) => {
     })
       .then((res) => res.json())
       .then((res) => {
+        if (res.status !== 200) {
+          throw new Error(res.status);
+        }
         resolve(res);
       })
       .catch((err) => {
@@ -86,13 +91,3 @@ export const validateToken = (token) => {
       });
   });
 };
-
-function createCookie(name, value, minutes) {
-  let expires = "";
-  if (minutes) {
-    let date = new Date();
-    date.setTime(date.getTime() + minutes * 60 * 1000);
-    expires = "; expires=" + date.toGMTString();
-  }
-  document.cookie = name + "=" + value + expires + "; path=/";
-}

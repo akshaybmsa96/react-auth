@@ -5,14 +5,17 @@ var cors = require("cors");
 const db = require("./db");
 const encyption = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const corsOptions = {
   origin: "http://localhost:3000",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "token"],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
 var bodyParser = require("body-parser");
 
@@ -66,15 +69,17 @@ app.post("/login", async function (req, res) {
       process.env.ACCESS_TOKEN_SECRET_KEY,
       { expiresIn: 60 }
     );
-    console.log(userToken);
+    res.cookie("loggedInToken", userToken, {
+      maxAge: 60 * 1000,
+    });
     setTimeout(() => {
       return res.json({ token: userToken, validated: isUSer });
-    }, 5000);
+    }, 1000);
   } else {
     setTimeout(() => {
       res.statusCode = 401;
       return res.send("User doesn't exists");
-    }, 5000);
+    }, 1000);
   }
 });
 
@@ -95,14 +100,13 @@ app.get("/register", function (req, res) {
 });
 
 app.get("/validate", function (req, res) {
-  const token = req.headers["token"];
+  const token = getCookie(req.headers.cookie, "loggedInToken");
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, function (err, user) {
     if (err) {
       res.statusCode = 401;
       res.send(err);
     } else {
-      console.log(user);
       res.json({ validate: true });
     }
   });
@@ -111,3 +115,18 @@ app.get("/validate", function (req, res) {
 app.listen("3001", function () {
   console.log("Server listening on port 3001");
 });
+
+const getCookie = (cookie, cname) => {
+  let name = cname + "=";
+  let ca = cookie.split(";");
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === " ") {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+};

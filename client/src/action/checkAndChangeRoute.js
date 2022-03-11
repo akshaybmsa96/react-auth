@@ -1,5 +1,5 @@
 export const checkLoggedInStatus = () => {
-  if (getCookie("loggedInStatus")) {
+  if (getCookie("loggedInToken")) {
     return true;
   } else {
     return false;
@@ -9,11 +9,12 @@ export const checkLoggedInStatus = () => {
 export const logoutAction = () => {
   var mydate = new Date();
   mydate.setTime(mydate.getTime() - 1);
-  document.cookie = "loggedInStatus=; expires=" + mydate.toGMTString();
+  document.cookie = "loggedInToken=; expires=" + mydate.toGMTString();
 };
 
 const getCookie = (cname) => {
   let name = cname + "=";
+  console.log(document.cookie);
   let ca = document.cookie.split(";");
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i];

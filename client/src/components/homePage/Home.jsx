@@ -17,6 +17,8 @@ export const Home = () => {
       })
       .catch((err) => {
         console.log("s0rry boss", err);
+        logoutAction();
+        navigate("/login");
       });
   };
 
